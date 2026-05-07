@@ -69,14 +69,23 @@ session_escaped=$(escape_for_json "$session_message")
 
 context="${session_escaped}\n\n${bootstrap_escaped}"
 
-# Output context injection as JSON
-# Uses printf to avoid bash 5.3+ heredoc expansion bug with large content
+# Output context injection as JSON.
+# Cursor hooks expect additional_context (snake_case).
+# Claude Code hooks expect hookSpecificOutput.additionalContext (nested).
+# Copilot CLI (v1.0.11+) and others expect additionalContext (top-level, SDK standard).
+# Claude Code reads BOTH additional_context and hookSpecificOutput without
+# deduplication, so we must emit only the field the current platform consumes.
+#
+# Uses printf instead of heredoc to work around bash 5.3+ heredoc expansion bug.
 if [ -n "${CURSOR_PLUGIN_ROOT:-}" ]; then
+    # Cursor sets CURSOR_PLUGIN_ROOT (may also set CLAUDE_PLUGIN_ROOT)
     printf '{\n  "additional_context": "%s"\n}\n' "$context"
-elif [ -n "${CLAUDE_PLUGIN_ROOT:-}" ]; then
+elif [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ -z "${COPILOT_CLI:-}" ]; then
+    # Claude Code sets CLAUDE_PLUGIN_ROOT without COPILOT_CLI
     printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$context"
 else
-    printf '{\n  "additional_context": "%s"\n}\n' "$context"
+    # Copilot CLI (sets COPILOT_CLI=1) or unknown platform — SDK standard format
+    printf '{\n  "additionalContext": "%s"\n}\n' "$context"
 fi
 
 exit 0

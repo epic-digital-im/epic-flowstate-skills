@@ -1,12 +1,20 @@
 {
-  "name": "epic-flowsate",
-  "version": "2.0.0",
-  "owner": { "name": "Spencer Thornock" },
+  "name": "epic-flowstate",
+  "description": "Epic Digital marketplace for FlowState skills, agents, and workflow automation plugins",
+  "owner": {
+    "name": "Spencer Thornock",
+    "email": "admin@epicdigital.media"
+  },
   "plugins": [
     {
       "name": "flowstate-skills",
+      "description": "FlowState skills library: entity management, registration, workflow execution, and process automation",
+      "version": "2.0.5",
       "source": "./",
-      "description": "FlowState entity management, registration, workflow, and process automation skills."
+      "author": {
+        "name": "Spencer Thornock",
+        "email": "admin@epicdigital.media"
+      }
     }
   ]
 }

@@ -1,3 +1,62 @@
+# FlowState Skills — Contributor & Agent Guide
+
+This repository is the **FlowState Skills** plugin: a library of composable skills
+for coding agents (Claude Code, Codex, Cursor, Gemini CLI, OpenCode, Copilot CLI,
+Factory Droid) that drive entity management, registration, workflow execution, and
+process automation across the FlowState platform.
+
+## What's Here
+
+- `skills/` — every FlowState skill, each in its own folder with a `SKILL.md` and
+  optional reference files. The bootstrap skill is
+  `skills/flowstate-using-flowstate-skills/SKILL.md`.
+- `hooks/` — cross-platform `SessionStart` hook that injects the bootstrap skill
+  into the agent's context on every new session, resume, clear, or compact.
+- `.claude-plugin/`, `.codex-plugin/`, `.cursor-plugin/`, `.opencode/`,
+  `gemini-extension.json` — per-provider plugin manifests so the same skills
+  library loads identically across harnesses.
+
+## Working in This Repo
+
+If you are an agent editing skills here, follow the
+**`flowstate-writing-skills`** skill. It enforces:
+
+1. SKILL.md frontmatter with `name` and `description` (description must include
+   "Use when…" and the trigger condition).
+2. Token efficiency — every line must earn its place.
+3. RED-GREEN-REFACTOR adapted for process documentation: write the failing
+   trigger case, observe the agent miss it, edit the skill, re-test.
+4. No project-specific or fork-specific content in shared skills. Domain
+   skills go in their own plugin.
+
+When you change a skill, update the bootstrap index at
+`skills/flowstate-using-flowstate-skills/SKILL.md` if the change affects which
+skill the agent should reach for.
+
+## Cross-Provider Parity
+
+Any change to skills, hooks, or plugin metadata MUST work across every supported
+harness. Validate at minimum on Claude Code; mention which other harnesses you
+tested in the PR description. New harness support requires a session transcript
+proving the bootstrap loads and skills auto-trigger end-to-end.
+
+## Versioning
+
+Bump `version` in lockstep across:
+- `.claude-plugin/plugin.json`
+- `.claude-plugin/marketplace.json`
+- `.codex-plugin/plugin.json`
+- `.cursor-plugin/plugin.json`
+- `gemini-extension.json`
+- `package.json`
+
+## Pull Requests
+
+- One problem per PR.
+- Describe the problem, not just the change.
+- Show the before/after agent behavior when modifying skill content.
+- Test on at least one harness and note which.
+
 <claude-mem-context>
 # Recent Activity
 
@@ -5,8 +64,8 @@
 
 ### Mar 29, 2026
 
-| ID     | Time    | T   | Title                            | Read |
-| ------ | ------- | --- | -------------------------------- | ---- |
-| #41685 | 7:41 AM | 🔵  | Flowstate Skills Directory Empty | ~155 |
+| ID     | Time    | T   | Title                                 | Read |
+| ------ | ------- | --- | ------------------------------------- | ---- |
+| #41752 | 7:45 AM | 🔵  | Flowstate Skills Plugin Configuration | ~202 |
 
 </claude-mem-context>

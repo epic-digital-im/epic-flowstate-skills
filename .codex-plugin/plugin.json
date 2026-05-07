@@ -1,0 +1,46 @@
+{
+  "name": "flowstate-skills",
+  "version": "2.0.5",
+  "description": "FlowState skills library: entity management, registration, workflow execution, and process automation across the FlowState platform.",
+  "author": {
+    "name": "Spencer Thornock",
+    "email": "admin@epicdigital.media",
+    "url": "https://github.com/epic-digital-im"
+  },
+  "homepage": "https://github.com/epic-digital-im/epic-flowstate-skills",
+  "repository": "https://github.com/epic-digital-im/epic-flowstate-skills",
+  "license": "MIT",
+  "keywords": [
+    "flowstate",
+    "skills",
+    "agent",
+    "workflow",
+    "entity-management",
+    "process-automation",
+    "tdd",
+    "best-practices"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "FlowState Skills",
+    "shortDescription": "FlowState entity, workflow, and process automation skills for coding agents",
+    "longDescription": "Use FlowState Skills to drive agent work through workspace and codebase registration, project setup, brainstorming, multi-phase planning, task execution, code review, business plan and product creation, agent inbox triage, and the full FlowState process automation surface.",
+    "developerName": "Spencer Thornock",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Onboard this repo into FlowState.",
+      "Triage my FlowState agent inbox.",
+      "Create a FlowState product for this project."
+    ],
+    "websiteURL": "https://github.com/epic-digital-im/epic-flowstate-skills",
+    "privacyPolicyURL": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+    "termsOfServiceURL": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
+    "brandColor": "#0EA5E9",
+    "screenshots": []
+  }
+}

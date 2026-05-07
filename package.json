@@ -1,0 +1,6 @@
+{
+  "name": "flowstate-skills",
+  "version": "2.0.5",
+  "type": "module",
+  "main": ".opencode/plugins/flowstate-skills.js"
+}

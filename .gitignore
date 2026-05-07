@@ -1,0 +1,8 @@
+.DS_Store
+node_modules/
+.worktrees/
+.private-journal/
+.claude/
+inspo/
+triage/
+*.log

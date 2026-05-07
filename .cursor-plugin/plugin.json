@@ -1,6 +1,7 @@
 {
   "name": "flowstate-skills",
-  "description": "FlowState skills library for Claude Code: entity management, registration, workflow execution, and process automation",
+  "displayName": "FlowState Skills",
+  "description": "FlowState entity management, registration, workflow execution, and process automation skills",
   "version": "2.0.5",
   "author": {
     "name": "Spencer Thornock",
@@ -15,8 +16,10 @@
     "agent",
     "workflow",
     "entity-management",
-    "process-automation",
-    "tdd",
-    "best-practices"
-  ]
+    "process-automation"
+  ],
+  "skills": "./skills/",
+  "agents": "./agents/",
+  "commands": "./commands/",
+  "hooks": "./hooks/hooks-cursor.json"
 }
