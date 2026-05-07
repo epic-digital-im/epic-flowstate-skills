@@ -1,0 +1,12 @@
+{
+  "name": "epic-flowsate",
+  "version": "2.0.0",
+  "owner": { "name": "Spencer Thornock" },
+  "plugins": [
+    {
+      "name": "flowstate-skills",
+      "source": "./",
+      "description": "FlowState entity management, registration, workflow, and process automation skills."
+    }
+  ]
+}
