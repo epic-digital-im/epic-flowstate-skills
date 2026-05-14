@@ -1,178 +1,175 @@
 ---
 name: flowstate-dojo-cli
-description: Use when running CRUD against the FlowState Dojo LMS from the CLI (`flowstate dojo *` or `flowstate cloud dojo *`), debugging "Missing Dojo API token" or 404 from `/dojo/*`, or building a new dojo subcommand against the canonical OpenAPI types - documents the dojo command tree, token resolution (env / config / cloud-pay JWT), and the gateway path-prefix routing for every dojo endpoint
+description: Use when running, debugging, or extending `flowstate dojo *` or `flowstate cloud dojo *` commands, checking the Dojo LMS command tree, resolving auth/token errors, or mapping CLI verbs to Dojo OpenAPI routes - provides the canonical Dojo CLI reference and links to workflow skills for agents
 ---
 
-# Dojo LMS CLI (Courses, Modules, Items, Enrollments, Teams)
+# Dojo LMS CLI Reference
 
 **Status:** Active
-**Purpose:** Reference for the `flowstate dojo` and `flowstate cloud dojo` command trees: how they authenticate, where they call, and which CRUD endpoints they expose
-**Scope:** Every dojo subcommand in `packages/flowstate-cli/src/cli-commands/dojo/`
-**Trigger:** Need to create/list/update/delete dojo entities, build a new dojo subcommand, debug an auth or routing failure
+**Purpose:** Canonical reference for the `flowstate dojo` and `flowstate cloud dojo` command trees
+**Scope:** Commands in `packages/flowstate-cli/src/cli-commands/dojo/` and the cloud wrapper in `cli-commands/cloud/dojo-subcommand.ts`
+**Trigger:** Need to run Dojo LMS commands, debug routing/auth, or build a new Dojo subcommand
 
 ---
 
 ## Overview
 
-There are **two** dojo command trees with the same subcommand surface:
+Use `flowstate cloud dojo` for production. It injects the production gateway URL and reads the `cloud-pay` JWT created by `flowstate cloud login`.
 
 | Tree | Token source | API URL |
 | ---- | ------------ | ------- |
-| `flowstate dojo *` | env `FLOWSTATE_DOJO_TOKEN` → file `~/.flowstate/config.json` `.dojo.token` | env `FLOWSTATE_DOJO_URL` → file `.dojo.apiUrl` → `PRODUCTION_URLS.dojo` |
-| `flowstate cloud dojo *` | cloud-pay JWT (`getCloudAuthToken()` in `cli-commands/cloud/cloud-auth.ts`) | `PRODUCTION_URLS.dojo` (= `https://api.epicflowstate.ai/dojo`) |
+| `flowstate cloud dojo *` | `~/.flowstate/config.json` `servers["cloud-pay"].auth.accessToken` | `https://api.epicflowstate.ai/dojo` |
+| `flowstate dojo *` | `--token` -> `FLOWSTATE_DOJO_TOKEN` -> config `.dojo.token` | `--api-url` -> `FLOWSTATE_DOJO_URL` -> config `.dojo.apiUrl` -> production |
 
-Use **`flowstate cloud dojo`** when an agent or human has run `flowstate cloud login` (wallet or OAuth). It's the recommended path — no separate token to manage. The bare `flowstate dojo` exists for legacy / explicit-token callers.
+Gateway path mapping:
 
 ```
-flowstate cloud dojo <verb>
-   │  preAction: setCloudDojoOverrides({ apiUrl: PRODUCTION_URLS.dojo, getToken: getCloudAuthToken })
-   ▼
-flowstate dojo <verb>
-   │  loadDojoConfig() → resolves apiUrl + token via overrides → env → file
-   ▼
-createDojoClient({ apiUrl, token })   (openapi-fetch with packages/flowstate-cli/src/generated/dojo/types.ts)
-   │  GET/POST/PATCH/DELETE
-   ▼
-api.epicflowstate.ai/dojo/...   (gateway strips /dojo, forwards to DOJO_API_SERVICE)
+flowstate cloud dojo courses list
+  -> https://api.epicflowstate.ai/dojo/courses
+  -> gateway strips /dojo
+  -> DOJO_API_SERVICE receives /courses
 ```
+
+All production `/dojo/*` routes are JWT-gated at the gateway, including utility routes.
 
 ---
 
-## Command tree
+## Related Agent Skills
 
-Both trees expose the shared core surface below. `flowstate dojo` (env-overridable) ALSO exposes a few extras not yet on `flowstate cloud dojo`: `skill`, `publisher`, `course`, and `seed-epic-digital`.
+Use these workflow skills instead of re-deriving command sequences:
 
-Shared between `flowstate dojo` and `flowstate cloud dojo`:
-
-| Subcommand | Purpose | OpenAPI path(s) |
-| ---------- | ------- | --------------- |
-| `courses list` | List courses | `GET /courses` |
-| `courses get <id>` | Course detail | `GET /courses/{id}` |
-| `courses create` | Create course | `POST /courses` |
-| `courses update <id>` | Patch course | `PATCH /courses/{id}` |
-| `courses delete <id>` | Delete course | `DELETE /courses/{id}` |
-| `courses publish <id>` | Publish course | `POST /courses/{id}/publish` |
-| `courses enroll <id>` | Enroll caller in course | `POST /courses/{id}/enroll` |
-| `modules list <courseId>` | List modules under a course | `GET /courses/{courseId}/modules` |
-| `modules get <id>` | Module detail | `GET /modules/{id}` |
-| `modules create <courseId>` | Create module | `POST /courses/{courseId}/modules` |
-| `modules update <id>` | Patch module | `PATCH /modules/{id}` |
-| `modules delete <id>` | Delete module | `DELETE /modules/{id}` |
-| `items list <moduleId>` | List items (lessons) | `GET /modules/{moduleId}/items` |
-| `items get <id>` | Item detail | `GET /module-items/{id}` |
-| `items create <moduleId>` | Create item | `POST /modules/{moduleId}/items` |
-| `items update <id>` | Patch item | `PATCH /module-items/{id}` |
-| `items delete <id>` | Delete item | `DELETE /module-items/{id}` |
-| `items complete <id>` | Mark completion | `POST /module-items/{id}/complete` |
-| `enrollments list` | List my enrollments | `GET /enrollments` |
-| `teams members <teamId>` | List team members | `GET /teams/{teamId}/members` |
-| `teams content <teamId>` | List team content | `GET /teams/{teamId}/content` |
-| `teams events <teamId> --event-id <id>` | List linked content for a team event | `GET /teams/{teamId}/events/{eventId}/linked-content` |
-| `profile` | Authenticated user profile | `GET /profile` |
-| `tokens` | Token balance | `GET /tokens/balance` |
-| `lead-subscribe` | Subscribe email to newsletter (public) | `POST /leads/subscribe` |
-| `url-metadata <url>` | Open Graph metadata (public) | `GET /url-metadata` |
-
-`flowstate dojo`-only extras:
-
-| Subcommand | Purpose |
-| ---------- | ------- |
-| `skill` | Skill catalog commands |
-| `publisher` | Publisher management |
-| `course` | Course catalog commands (read-only listing-style) |
-| `seed-epic-digital` | Sign in as the named agent and create the epic-digital team (idempotent) |
-
-Canonical types: `packages/flowstate-cli/src/generated/dojo/types.ts` (auto-generated from the dojo OpenAPI spec — never hand-edit).
+| Skill | Use |
+| ----- | --- |
+| `flowstate-dojo-agent-session` | Authenticate and verify a Dojo-capable agent shell |
+| `flowstate-dojo-course-lifecycle` | Create/manage courses, modules, items, enrollment, progress |
+| `flowstate-dojo-team-community` | Create/manage teams, members, invitations, content, events |
+| `flowstate-dojo-production-smoke` | Run production API/CLI smoke after deploys |
 
 ---
 
-## Quick reference
+## Command Surface
 
-### Headless agent CRUD (cloud-pay JWT)
+Prefer `--json` for agent work so results can be parsed with `jq`.
+
+### Utility
+
+| Command | Route | Notes |
+| ------- | ----- | ----- |
+| `profile --json` | `GET /profile` | Requires human cloud auth; bootstraps profile if missing |
+| `tokens --json` | `GET /tokens/balance` | Returns `{ userId, balance }` |
+| `lead-subscribe --email <email> [--name <name>] [--source <source>] --json` | `POST /leads/subscribe` | Public upstream route, still gateway JWT-gated in production |
+| `url-metadata <url> --json` | `GET /url-metadata` | Rejects URL credentials and local/private hosts |
+
+### Courses
+
+| Command | Route | Notes |
+| ------- | ----- | ----- |
+| `courses list [--status <status>] [--search <q>] [--page <n>] [--limit <n>] --json` | `GET /courses` | Returns paginated `{ data, total, page, limit, hasMore }` |
+| `courses create --name <name> [--code <code>] [--description <desc>] [--format self_paced|instructor_led|blended] [--category <cat>] [--tags a,b] [--allow-self-enrollment] --json` | `POST /courses` | Caller becomes instructor/owner |
+| `courses get <courseIdOrCode> --json` | `GET /courses/{id}` | Accepts id or code where backend supports it |
+| `courses update <courseId> [flags] --json` | `PUT /courses/{id}` | Replaces supplied fields only |
+| `courses publish <courseId> --json` | `POST /courses/{id}/publish` | Required before self-enrollment |
+| `courses delete <courseId> --json` | `DELETE /courses/{id}` | Archives/soft-deletes; JSON output is `{}` or command wrapper metadata |
+
+### Modules
+
+| Command | Route | Notes |
+| ------- | ----- | ----- |
+| `modules list <courseId> [--page <n>] [--limit <n>] [--search <q>] --json` | `GET /courses/{courseId}/modules` | Use this to retrieve module ids |
+| `modules create <courseId> --name <name> [--description <desc>] [--position <n>] [--prerequisites a,b] [--require-sequential] --json` | `POST /courses/{courseId}/modules` | Creates a draft module |
+| `modules update <moduleId> [--name <name>] [--description <desc>] [--position <n>] [--require-sequential true|false] --json` | `PUT /modules/{id}` | There is no production `GET /modules/{id}` route |
+| `modules delete <moduleId> --json` | `DELETE /modules/{id}` | Archives/soft-deletes |
+
+### Items
+
+| Command | Route | Notes |
+| ------- | ----- | ----- |
+| `items create <moduleId> --type page|assignment|quiz|discussion|file|video|external_url|scorm --title <title> [--content <content>] [--position <n>] [--completion-type view|submit|score|manual] [--duration-minutes <n>] [--required] --json` | `POST /modules/{moduleId}/items` | Creates module content |
+| `items update <itemId> [flags] --json` | `PUT /module-items/{id}` | Updates supplied fields |
+| `items complete <itemId> --json` | `POST /module-items/{id}/complete` | Marks item complete for authenticated user |
+| `items delete <itemId> --json` | `DELETE /module-items/{id}` | Hard-deletes item |
+
+The current CLI does not expose `items list` or `items get` commands. Use course/module responses or direct API smoke only when necessary.
+
+### Enrollments
+
+| Command | Route | Notes |
+| ------- | ----- | ----- |
+| `enrollments list [--status active|completed|dropped|expired] [--page <n>] [--limit <n>] --json` | `GET /enrollments` | Authenticated user only |
+| `enrollments enroll --course-id <courseId> --json` | `POST /courses/{id}/enroll` | Works after course is published and self-enrollment is allowed |
+
+### Teams
+
+| Command | Route | Notes |
+| ------- | ----- | ----- |
+| `teams create --name <name> --slug <slug> --json` | `POST /teams` | Slug: lowercase letters, digits, hyphens; 2-60 chars; no leading/trailing hyphen |
+| `teams list [--mine] --json` | `GET /teams` | `--mine` filters to memberships |
+| `teams get <idOrSlug> --json` | `GET /teams/{idOrSlug}` | Accepts id or slug |
+| `teams update <idOrSlug> --name <name> --json` | `PATCH /teams/{idOrSlug}` | Owner only |
+| `teams delete <idOrSlug> --json` | `DELETE /teams/{idOrSlug}` | Owner only; cascades members, invitations, content |
+| `teams members list <idOrSlug> --json` | `GET /teams/{teamId}/members` | Team members only |
+| `teams members add <idOrSlug> (--profile <profileId> | --wallet <address>) [--role member|admin] --json` | `POST /teams/{teamId}/members` | Owner/admin only |
+| `teams members role <idOrSlug> <profileId> --role member|admin --json` | `PATCH /teams/{teamId}/members/{profileId}` | Owner only |
+| `teams members remove <idOrSlug> <profileId>` | `DELETE /teams/{teamId}/members/{profileId}` | Owner/admin rules apply |
+| `teams invite <idOrSlug> (--email <email> | --wallet <address>) [--role member|admin] --json` | `POST /teams/{teamId}/invitations` | Owner/admin only |
+| `teams invitations list <idOrSlug> --json` | `GET /teams/{teamId}/invitations` | Owner/admin only |
+| `teams invitations accept <invitationId> --json` | `POST /invitations/{invitationId}/accept` | Invitee-facing |
+| `teams my-invitations --json` | `GET /invitations/mine` | Current user invitations |
+| `teams request <idOrSlug> --json` | `POST /teams/{teamId}/requests` | Request to join |
+| `teams requests <idOrSlug> --json` | `GET /teams/{teamId}/requests` | Owner/admin only |
+| `teams content list <idOrSlug> --json` | `GET /teams/{teamId}/content` | Members only |
+| `teams content add <idOrSlug> --type post|event|link --title <title> [...] --json` | `POST /teams/{teamId}/content` | Events require `--event-date` |
+| `teams content update <idOrSlug> <contentId> [flags] --json` | `PATCH /teams/{teamId}/content/{contentId}` | Creator/admin/owner |
+| `teams content remove <idOrSlug> <contentId>` | `DELETE /teams/{teamId}/content/{contentId}` | Creator/admin/owner |
+| `teams attendees join <idOrSlug> <contentId> --json` | `POST /teams/{teamId}/content/{contentId}/attendees` | Event content only |
+| `teams attendees leave <idOrSlug> <contentId> <profileId>` | `DELETE /teams/{teamId}/content/{contentId}/attendees/{profileId}` | Self/admin/owner |
+| `teams events <idOrSlug> --event-id <contentId> --json` | `GET /teams/{teamId}/events/{eventId}/linked-content` | Lists content linked to an event |
+
+---
+
+## Output Contracts
+
+Use `jq` defensively because some commands return paginated lists and some return single records:
 
 ```bash
-# Prerequisite: cloud login (see flowstate-cli-cloud-auth / flowstate-cli-wallet-auth)
-flowstate cloud login --method wallet --wallet "$(cat /agent/config/wallet/eth-private-key)" --identity-url https://id.epicflowstate.ai
-
-# CRUD
-flowstate cloud dojo profile
-flowstate cloud dojo courses list --json
-flowstate cloud dojo courses create --title "Q4 Strategy" --description "Test course"
-COURSE_ID=$(flowstate cloud dojo courses list --json | jq -r '.[0].id')
-flowstate cloud dojo modules create $COURSE_ID --title "Module 1"
-MOD_ID=$(flowstate cloud dojo modules list $COURSE_ID --json | jq -r '.[0].id')
-flowstate cloud dojo items create $MOD_ID --title "Lesson 1" --content-type lesson
-flowstate cloud dojo courses publish $COURSE_ID
-flowstate cloud dojo enrollments list
+flowstate cloud dojo courses list --limit 1 --json | jq '.data[0].id'
+flowstate cloud dojo profile --json | jq -r '.id'
+flowstate cloud dojo url-metadata https://example.com --json | jq '{url,title}'
 ```
 
-### Operator with explicit token
-
-```bash
-export FLOWSTATE_DOJO_TOKEN='eyJ...'
-export FLOWSTATE_DOJO_URL='https://api.epicflowstate.ai/dojo'
-flowstate dojo profile
-flowstate dojo courses list
-```
-
-### JSON output (for piping)
-
-Every CRUD subcommand accepts `--json` for machine-readable output. Without `--json`, output is human-readable tables/text.
+Successful empty deletes should be treated as success by exit code and HTTP status. Modern CLI builds return JSON-safe `{}` for empty 2xx responses.
 
 ---
 
-## Token resolution order (`loadDojoConfig`)
-
-`packages/flowstate-cli/src/cli-commands/dojo/config.ts`:
-
-1. Explicit `--token <jwt>` flag
-2. `cloudOverride.getToken()` (set by `flowstate cloud dojo` preAction → `getCloudAuthToken()`)
-3. `process.env.FLOWSTATE_DOJO_TOKEN`
-4. File config: `~/.flowstate/config.json` `.dojo.token`
-
-If all four are empty:
-
-```
-Missing Dojo API token. Set FLOWSTATE_DOJO_TOKEN, use --token <jwt>, or configure ~/.flowstate/config.json.
-```
-
-The fix is almost always `flowstate cloud login`, then re-run via `flowstate cloud dojo *` (which auto-resolves the cloud-pay JWT through the override).
-
----
-
-## Gateway routing
-
-All dojo endpoints are JWT-gated at the gateway. Path mapping:
-
-```
-CLI request:    https://api.epicflowstate.ai/dojo/courses
-Gateway:        matches /dojo/* → DOJO_API_SERVICE, stripPath: true
-Upstream sees:  /courses
-```
-
-See `flowstate-cloud-gateway-routing` for the full route table and proxy/NO_PROXY notes.
-
----
-
-## Common errors
+## Common Errors
 
 | Symptom | Cause | Fix |
 | ------- | ----- | --- |
-| `Missing Dojo API token` | No cloud-pay session AND no env/file token | Run `flowstate cloud login` |
-| `Error (404): Dojo API request failed (404)` from `cloud dojo profile` | Production dojo backend not yet deployed (OpenAPI returns empty paths) | Server-side issue; tracked at the gateway-routes level. Verify with `curl https://api.epicflowstate.ai/dojo/openapi.json` — if `paths: {}`, backend stub. |
-| `Error: fetch failed` | Overwatch MITM blocks `api.epicflowstate.ai` | Add the host to NO_PROXY (see `flowstate-agent-cli-bootstrap`) |
-| `403 Forbidden` on a write CRUD | Token valid but caller lacks permission | Caller's user/org doesn't own the resource — check ownership and re-auth as the right wallet |
-| `Unexpected non-JSON response from MCP server: ...` | Wrong endpoint (calling MCP instead of dojo gateway) | Use `flowstate cloud dojo` (not bare `flowstate dojo` if you intend production) |
+| `Missing Dojo API token` | No `cloud-pay` profile or explicit token | Run `flowstate cloud login` or use `flowstate-dojo-agent-session` |
+| `Not authenticated with FlowState Cloud` | Missing/expired cloud auth | Re-run `flowstate cloud login` |
+| `401 Missing Authorization header` | Calling production `/dojo/*` without cloud wrapper/token | Use `flowstate cloud dojo`, not direct unauthenticated curl |
+| `404 Not Found` with plain text | Route is not deployed or command assumes a route that does not exist | Check `https://api.epicflowstate.ai/dojo/openapi.json` |
+| `403 Forbidden` | Caller is not owner/admin/member for that operation | Verify profile/team/course ownership |
+| `slug must be 2-60 chars...` | Team slug invalid | Use lowercase letters, digits, hyphens only |
+| `URL must not include credentials` | Metadata URL contained `user:pass@` | Strip credentials before calling |
+| `URL host is not allowed` | Metadata URL points to local/private host | Use a public HTTP(S) URL |
 
 ---
 
-## Cross-references
+## Verification
 
-- `flowstate-cli-cloud-auth` — how `cloud-pay` JWT gets minted (the preferred token source)
-- `flowstate-cli-wallet-auth` — agent containers using SAGA wallet to log in
-- `flowstate-cloud-gateway-routing` — `/dojo/*` route specifics
-- Generated OpenAPI types: `packages/flowstate-cli/src/generated/dojo/types.ts` (regenerate via the `yarn generate:types` script when the spec changes)
+Minimum healthy production checks:
+
+```bash
+flowstate cloud dojo profile --json | jq -e '.id and .userId'
+flowstate cloud dojo tokens --json | jq -e 'has("balance")'
+flowstate cloud dojo courses list --limit 1 --json | jq -e 'has("data")'
+flowstate cloud dojo url-metadata https://example.com --json | jq -e '.url and .title'
+```
+
+For post-deploy validation, use `flowstate-dojo-production-smoke`.
 
 ---
 
 _Created: 2026-05-04_
+_Updated: 2026-05-14_

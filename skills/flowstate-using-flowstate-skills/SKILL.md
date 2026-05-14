@@ -173,7 +173,11 @@ Use these when creating products, linking to business plans, and associating tea
 | `flowstate-saga-wallet`             | Wallet management beyond login: SAGA identity export, key rotation, multi-chain consistency |
 | `flowstate-cloud-gateway-routing`   | `api.epicflowstate.ai/<service>` route table, stripPath, NO_PROXY, x-org-id requirement     |
 | `flowstate-agent-cli-bootstrap`     | Composes local + cloud auth inside an openclaw sidecar (NO_PROXY, mounts, env)              |
-| `flowstate-dojo-cli`                | `flowstate dojo` / `flowstate cloud dojo` CRUD (courses, modules, items, enrollments, teams) |
+| `flowstate-dojo-cli`                | Canonical `flowstate dojo` / `flowstate cloud dojo` command reference                       |
+| `flowstate-dojo-agent-session`      | Preparing and verifying an agent shell before running Dojo CLI commands                     |
+| `flowstate-dojo-course-lifecycle`   | Course/module/item authoring, publishing, enrollment, progress, and cleanup                 |
+| `flowstate-dojo-team-community`     | Team CRUD, members, invitations, content, events, and attendee workflows                    |
+| `flowstate-dojo-production-smoke`   | End-to-end production Dojo API/CLI smoke after deploys or contract changes                  |
 | `flowstate-plugin-lifecycle`        | `flowstate plugin create → build → enroll → publish → install` (.fsext, ed25519 signing)    |
 | `flowstate-saga-skill-record`       | Recording verified skills via `saga-record-skill` MCP (local-stack equivalent of dojo publish) |
 
@@ -266,6 +270,12 @@ flowstate-test-driven-development              <- cross-cutting: all implementat
 
 flowstate-code-review                          <- requesting reviews
 └── flowstate-receiving-code-review            <- handling review feedback
+
+flowstate-dojo-cli                             <- canonical Dojo CLI command reference
+├── flowstate-dojo-agent-session               <- auth and session readiness before Dojo calls
+├── flowstate-dojo-course-lifecycle            <- course/module/item/enrollment workflows
+├── flowstate-dojo-team-community              <- team/member/content/event workflows
+└── flowstate-dojo-production-smoke            <- production deploy verification
 
 flowstate-task-execution                       <- references these sub-skills:
 ├── flowstate-agent-identity                   <- Step 0: load agent before claiming task
