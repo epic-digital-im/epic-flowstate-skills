@@ -2,7 +2,7 @@
   "name": "flowstate-skills",
   "displayName": "FlowState Skills",
   "description": "FlowState entity management, registration, workflow execution, and process automation skills",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "author": {
     "name": "Spencer Thornock",
     "email": "admin@epicdigital.media"

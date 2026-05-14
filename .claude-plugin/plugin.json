@@ -1,7 +1,7 @@
 {
   "name": "flowstate-skills",
   "description": "FlowState skills library for Claude Code: entity management, registration, workflow execution, and process automation",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "author": {
     "name": "Spencer Thornock",
     "email": "admin@epicdigital.media"

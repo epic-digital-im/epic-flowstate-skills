@@ -1,6 +1,6 @@
 {
   "name": "flowstate-skills",
   "description": "FlowState entity management, registration, workflow execution, and process automation skills",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "contextFileName": "GEMINI.md"
 }

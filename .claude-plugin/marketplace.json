@@ -9,7 +9,7 @@
     {
       "name": "flowstate-skills",
       "description": "FlowState skills library: entity management, registration, workflow execution, and process automation",
-      "version": "2.0.5",
+      "version": "2.0.6",
       "source": "./",
       "author": {
         "name": "Spencer Thornock",
