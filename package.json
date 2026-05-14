@@ -2,5 +2,9 @@
   "name": "flowstate-skills",
   "version": "2.0.5",
   "type": "module",
-  "main": ".opencode/plugins/flowstate-skills.js"
+  "main": ".opencode/plugins/flowstate-skills.js",
+  "scripts": {
+    "sync:codex": "node scripts/sync-codex-skills.mjs",
+    "sync:codex:dry-run": "node scripts/sync-codex-skills.mjs --dry-run"
+  }
 }

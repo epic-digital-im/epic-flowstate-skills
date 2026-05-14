@@ -69,6 +69,17 @@ If FlowState Skills is not yet available in the official Codex marketplace,
 install directly from this repository by cloning it and pointing your Codex
 config at `.codex-plugin/plugin.json`.
 
+For local development, keep Codex's installed skill copies synchronized from
+this repository:
+
+```bash
+node scripts/sync-codex-skills.mjs --dry-run
+node scripts/sync-codex-skills.mjs
+```
+
+The repository's `skills/` directory is the source of truth; `~/.codex/skills`
+is a generated local install target.
+
 ### Cursor
 
 - In Cursor Agent chat, install from the marketplace:
