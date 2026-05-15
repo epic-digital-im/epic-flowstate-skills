@@ -6,26 +6,29 @@ description: Use when creating or reviewing package-local human documentation, p
 # FlowState Package Docs Standards
 
 **Status:** Active
-**Purpose:** Define the required local human documentation, agent-skill, and feature inventory structure for FlowState monorepo packages.
+**Purpose:** Define the required local human documentation, agent-skill, Dojo publication, and feature inventory structure for FlowState monorepo packages.
 **Scope:** Package directories such as `packages/flowstate-auth-server/.flowstate`.
 **Trigger:** A package needs new docs, docs review, package-local agent skills, or feature matrix backfill.
-**Output:** Package-local human docs, agent skills, and feature inventory evidence.
+**Output:** Package-local human docs, agent skills, Dojo skill/course manifests, and feature inventory evidence.
 
 ---
 
 ## Overview
 
-Each package owns three local knowledge surfaces:
+Each package owns four local knowledge surfaces:
 
 1. Human documentation under `.flowstate/docs`.
 2. Agent skill equivalents under `.flowstate/skills`.
 3. Feature inventory and matrix evidence under `.flowstate/feature-matrix`.
+4. Dojo skill and LMS course manifests under `.flowstate/dojo`.
 
-Human docs explain the package to people. Package-local skills explain the package to agents in a concise, executable form. Feature inventories preserve current-state evidence for later global feature matrix reconciliation.
+Human docs explain the package to people. Package-local skills explain the package to agents in a concise, executable form. Feature inventories preserve current-state evidence for later global feature matrix reconciliation. Dojo manifests publish the same package knowledge into FlowState Cloud Dojo as a versioned skill and course.
 
 The global architecture feature matrix remains the source of truth for planned capability coverage. Package audit work should link obvious matches and defer uncertain mappings instead of forcing them.
 
 Package npm identity must follow `flowstate-epicdm-npm-scope`: `@epicdm` is the canonical npm organization for FlowState packages, and `@epic-flow` is legacy rename debt. Generated docs, skills, examples, and feature inventories must not introduce new `@epic-flow` references.
+
+Package Dojo identity and versioning must follow `flowstate-package-dojo-sync`: the package `package.json` version is the version authority, and Dojo skill/course manifests must match that version when publishable.
 
 ---
 
@@ -51,9 +54,13 @@ packages/<package>/.flowstate/
 ├── skills/
 │   └── <skill-slug>/
 │       └── SKILL.md
-└── feature-matrix/
-    ├── package-features.json
-    └── handoff-note.md
+├── feature-matrix/
+│   ├── package-features.json
+│   └── handoff-note.md
+└── dojo/
+    ├── skill.yaml
+    ├── course.json
+    └── sync-state.json
 ```
 
 Optional package-local skills:
@@ -210,6 +217,22 @@ Each package-local skill must:
 The package skill is not a marketing overview. It is the agent equivalent of operational docs: concise, executable, and evidence-backed.
 
 Do not install package-local skills into the global user skill directory during package backfill. They are package artifacts first; promotion to shared skills is a later review decision.
+
+---
+
+## Dojo Publication Requirements
+
+Every publishable package must keep Dojo artifacts beside docs:
+
+- `.flowstate/dojo/skill.yaml` publishes the package-local agent skill to the Dojo skill catalog.
+- `.flowstate/dojo/course.json` publishes the package human docs as a Dojo LMS course.
+- `.flowstate/dojo/sync-state.json` records cloud IDs, version IDs, verification status, and unresolved sync items.
+
+The Dojo skill and course versions must match `package.json` `version`. Human docs and agent skills must describe the same package behavior before either artifact is published.
+
+Course lessons should map to the required docs pages: overview, API, workflows, troubleshooting, maintenance, and feature matrix. Screenshots and videos belong under `.flowstate/docs/media` and must only be referenced when they exist or are known stable external URLs.
+
+Use `flowstate-package-dojo-sync` for manifest shapes, CLI commands, publish gates, and sync-state rules.
 
 ### Package Skill Naming
 

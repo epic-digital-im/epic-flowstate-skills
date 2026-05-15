@@ -1,25 +1,25 @@
 ---
 name: flowstate-package-docs-backfill
-description: Use when packages lack package-local human docs, package agent skills, documentation config, or feature inventory files generated from package evidence and FlowState package standards.
+description: Use when packages lack package-local human docs, package agent skills, Dojo skill/course manifests, documentation config, or feature inventory files generated from package evidence and FlowState package standards.
 ---
 
 # FlowState Package Docs Backfill
 
 **Status:** Active
-**Purpose:** Create or repair missing package-local human docs, package agent skills, and feature inventory scaffolding.
+**Purpose:** Create or repair missing package-local human docs, package agent skills, Dojo manifests, and feature inventory scaffolding.
 **Scope:** One package or a backfill queue from `flowstate-package-docs-audit`.
 **Trigger:** Package docs, package skills, or feature inventory are missing, partial, stale, or not route-compatible.
 **Input:** Package path and optional audit queue item.
-**Output:** Standard `.flowstate/docs`, `.flowstate/skills`, and package feature matrix files.
+**Output:** Standard `.flowstate/docs`, `.flowstate/skills`, `.flowstate/dojo`, and package feature matrix files.
 
 ---
 
 ## Overview
 
-Backfill docs and skills conservatively from evidence in the package. Prefer accurate placeholders over confident guesses.
+Backfill docs, skills, and Dojo manifests conservatively from evidence in the package. Prefer accurate placeholders over confident guesses.
 
 ```text
-inspect package -> infer docs type -> create human docs -> create package skill -> write feature inventory -> verify
+inspect package -> infer docs type -> create human docs -> create package skill -> write dojo manifests -> write feature inventory -> verify
 ```
 
 ---
@@ -28,6 +28,7 @@ inspect package -> infer docs type -> create human docs -> create package skill 
 
 - Use `flowstate-package-docs-standards`.
 - Use `flowstate-epicdm-npm-scope`.
+- Use `flowstate-package-dojo-sync` for Dojo skill/course manifests and version lock rules.
 - Read the package's `package.json`.
 - Read existing `.flowstate/config.json`, README, source entry points, tests, scripts, and existing docs.
 - If creating local files that should be indexed as FlowState documents, use `flowstate-document-creation` after the local content exists.
@@ -75,17 +76,30 @@ inspect package -> infer docs type -> create human docs -> create package skill 
    - `.flowstate/docs/feature-matrix/index.md`
    - `.flowstate/feature-matrix/handoff-note.md`
 
-7. Add explicit unknowns.
+7. Create package Dojo artifacts.
+   - `.flowstate/dojo/skill.yaml`
+   - `.flowstate/dojo/course.json`
+   - `.flowstate/dojo/sync-state.json`
+   - Match `skill.yaml` `metadata.version`, `course.json` `version`, and `sync-state.json` `packageVersion` to `package.json` `version`.
+   - Derive skill content from the package-local `SKILL.md`.
+   - Derive course lessons from the required human docs pages.
+   - Include screenshots/videos only when real files or stable external URLs exist.
+
+8. Add explicit unknowns.
    - Use `TBD` or `needs-audit` for unclear behavior.
    - Do not invent APIs, screenshots, or feature statuses.
    - Do not force global feature links. Strong obvious links only; unresolved candidates go in the handoff note.
    - Add a `Legacy NPM Scope Findings` section to the handoff note when `@epic-flow` references remain.
+   - Add Dojo publish blockers to `.flowstate/dojo/sync-state.json.unresolvedItems`.
 
-8. Verify.
+9. Verify.
    - Confirm all required files exist.
    - Confirm nested pages use directory `index.md`.
    - Confirm package skill frontmatter has `name` and `description`.
    - Parse `package-features.json`.
+   - Parse `.flowstate/dojo/course.json`.
+   - Confirm Dojo versions match `package.json`.
+   - Run `flowstate dojo skill validate .flowstate/dojo/skill.yaml` when the CLI is available; publish only when explicitly requested.
    - Run package typecheck or the closest lightweight package command when available.
    - Do not run docs sync unless the user explicitly asks; docs sync is commonly owned by a separate project.
 
@@ -188,9 +202,11 @@ description: Use when working on <package-name> package behavior, docs, tests, r
 - Do not claim `available` without source or test evidence.
 - Do not update global FlowState feature records from this skill.
 - Do not install package-local skills into the global skills directory during package backfill.
+- Do not publish Dojo skills or courses during backfill unless explicitly requested.
 - Do not run docs sync as part of package backfill unless explicitly requested.
 - Follow the canonical documentation rules embedded in `flowstate-package-docs-standards`: docs config, app/library template choice, frontmatter, nested `index.md` pages, code block languages, and TSDoc expectations for library APIs.
 - Follow `flowstate-epicdm-npm-scope`: use `@epicdm` for generated package names, docs examples, workspace commands, and package skill identity; treat `@epic-flow` as a legacy finding.
+- Follow `flowstate-package-dojo-sync`: create version-locked Dojo skill/course manifests and sync-state records for publishable packages.
 - If many packages are backfilled, work from a queue and keep each package change reviewable.
 
 ---
