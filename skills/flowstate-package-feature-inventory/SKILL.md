@@ -6,7 +6,7 @@ description: Use when a package needs a local feature inventory or package featu
 # FlowState Package Feature Inventory
 
 **Status:** Active
-**Purpose:** Build package-local feature inventories that can later be reconciled against the global FlowState feature matrix.
+**Purpose:** Build package-local feature inventories that can later be reconciled against the global FlowState feature matrix and package Dojo artifacts.
 **Scope:** Package-local `.flowstate/feature-matrix` and `.flowstate/docs/feature-matrix`.
 **Trigger:** Before deep feature audits, after package docs/skills backfill, or during PR documentation maintenance.
 **Input:** Package path plus optional global feature matrix manifest.
@@ -37,6 +37,7 @@ Inspect:
 - Tests and fixtures.
 - README and existing docs.
 - Package-local skills under `.flowstate/skills`.
+- Package Dojo manifests under `.flowstate/dojo`.
 - Existing `.flowstate/config.json`.
 - Global matrix records from `flowstate-feature-matrix-load`.
 - Product links from `flowstate-feature-product-link-audit`.
@@ -71,6 +72,7 @@ Use these signals to map local features to global matrix items:
 7. Add manual review rows for unmapped features.
 8. Write `.flowstate/feature-matrix/handoff-note.md` with unresolved items.
 9. Record `@epic-flow` references as legacy npm scope findings unless safely updated.
+10. Record Dojo skill/course links or unresolved Dojo sync items when `.flowstate/dojo/sync-state.json` exists.
 
 ---
 
@@ -85,6 +87,7 @@ Use these signals to map local features to global matrix items:
 5. Global Features Claimed By Package
 6. Evidence Appendix
 7. Audit Notes
+8. Dojo Skill And Course Links
 
 `handoff-note.md` should include:
 
@@ -94,6 +97,7 @@ Use these signals to map local features to global matrix items:
 4. Negative evidence for expected but missing capabilities.
 5. Questions for the later reconciliation pass.
 6. Legacy npm scope findings (`@epic-flow` -> `@epicdm`) when present.
+7. Dojo sync blockers or missing version links when present.
 
 ---
 
@@ -107,6 +111,7 @@ Use these signals to map local features to global matrix items:
 - Keep generated JSON deterministic and sorted by `localFeatureId`.
 - Treat broad domain matches as `low` confidence candidates, not strong links.
 - Use `@epicdm` as the canonical npm package scope in generated feature inventory. Do not treat `@epic-flow` references as product/feature evidence except as legacy rename debt.
+- Include package Dojo skill/course identifiers as supporting evidence only after they are present in `sync-state.json`; do not fabricate cloud IDs.
 
 ---
 

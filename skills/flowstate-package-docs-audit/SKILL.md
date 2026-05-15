@@ -1,25 +1,25 @@
 ---
 name: flowstate-package-docs-audit
-description: Use when a monorepo package set may have missing, stale, or non-standard package docs, package-local agent skills, or feature inventory links - scans packages and produces a reviewable backfill queue.
+description: Use when a monorepo package set may have missing, stale, or non-standard package docs, package-local agent skills, Dojo skill/course manifests, or feature inventory links - scans packages and produces a reviewable backfill queue.
 ---
 
 # FlowState Package Docs Audit
 
 **Status:** Active
-**Purpose:** Audit package-local human docs, package agent skills, and feature inventory coverage before deep feature reconciliation.
+**Purpose:** Audit package-local human docs, package agent skills, Dojo artifacts, and feature inventory coverage before deep feature reconciliation.
 **Scope:** Monorepos with packages under `packages/*`.
 **Trigger:** Before docs/skills backfill, before feature matrix audit, or when package knowledge coverage is unknown.
 **Input:** Monorepo root path.
-**Output:** Package audit report and backfill queue covering docs, skills, and feature inventory links.
+**Output:** Package audit report and backfill queue covering docs, skills, Dojo manifests, catalog course content, and feature inventory links.
 
 ---
 
 ## Overview
 
-Package documentation audit is the first step before feature matrix audit. The global feature audit needs package-level evidence, so every package must have predictable human docs, package-local agent skills, and a feature inventory.
+Package documentation audit is the first step before feature matrix audit. The global feature audit needs package-level evidence, so every package must have predictable human docs, package-local agent skills, Dojo publish manifests, catalog course content, and a feature inventory.
 
 ```text
-scan packages -> validate docs/skills/config/features -> classify gaps -> write report -> queue backfill
+scan packages -> validate docs/skills/dojo/config/features -> classify gaps -> write report -> queue backfill
 ```
 
 ---
@@ -76,7 +76,15 @@ scan packages -> validate docs/skills/config/features -> classify gaps -> write 
    - Flag `@epic-flow` references as legacy rename debt.
    - Classify legacy references as `safe-to-update`, `requires-code-review`, or `intentional-compatibility`.
 
-9. Produce report.
+9. Check Dojo readiness.
+   - Use `flowstate-package-dojo-audit`.
+   - Confirm `.flowstate/dojo/skill.yaml`, `.flowstate/dojo/course.json`, and `.flowstate/dojo/sync-state.json` exist for publishable packages.
+   - Confirm Dojo skill/course versions match `package.json` `version`.
+   - Confirm human docs and package-local skills are behaviorally aligned.
+   - Confirm course lessons cover overview, API, workflows, troubleshooting, maintenance, and feature matrix docs.
+   - Run local `flowstate dojo skill validate <skill.yaml>` only when the CLI is available and validation is in scope; never publish from the audit skill.
+
+10. Produce report.
 
 ---
 
@@ -105,6 +113,8 @@ scan packages -> validate docs/skills/config/features -> classify gaps -> write 
       "agentSkillStatus": "complete|partial|missing|disabled",
       "missingSkillFiles": [],
       "featureMatrixStatus": "complete|partial|missing",
+      "dojoStatus": "ready|partial|missing|blocked",
+      "dojoVersionStatus": "matched|mismatched|missing",
       "unresolvedFeatureLinks": 0,
       "legacyNpmScopeReferences": 0,
       "recommendedAction": "none|backfill|repair|manual-review"
@@ -130,11 +140,14 @@ Use deterministic output paths:
 - Do not write package docs from the audit skill.
 - Do not write package skills from the audit skill.
 - Do not change feature matrix records.
+- Do not publish Dojo skills or courses from the audit skill.
 - Treat missing package docs as a backfill queue, not an error.
 - Treat missing package skills as a backfill queue, not an error.
+- Treat missing Dojo manifests as a backfill queue, not an error.
 - Keep package paths relative to the monorepo root in reports.
 - Enforce the canonical documentation rules embedded in `flowstate-package-docs-standards`: config schema, app/library template choice, markdown frontmatter, nested `index.md` pages, language-tagged code fences, and TSDoc expectations for library APIs.
 - Enforce `flowstate-epicdm-npm-scope`: new docs, skills, examples, and feature inventories use `@epicdm`; `@epic-flow` is a legacy finding, not a canonical package scope.
+- Enforce `flowstate-package-dojo-sync`: Dojo skill and course manifests are version-locked to `package.json`, human docs and agent skills stay in parity, and publish status is only claimed with same-task CLI evidence.
 
 ---
 

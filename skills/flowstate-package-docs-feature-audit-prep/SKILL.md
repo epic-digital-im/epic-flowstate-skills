@@ -1,25 +1,25 @@
 ---
 name: flowstate-package-docs-feature-audit-prep
-description: Use before running FlowState feature matrix audit when package human docs, package agent skills, and package-local feature inventories need to be backfilled, normalized, or verified across a monorepo.
+description: Use before running FlowState feature matrix audit when package human docs, package agent skills, Dojo artifacts, and package-local feature inventories need to be backfilled, normalized, or verified across a monorepo.
 ---
 
 # FlowState Package Docs Feature Audit Prep
 
 **Status:** Active
-**Purpose:** Prepare package human docs, agent skills, and feature inventories as evidence for a later deep feature matrix audit.
+**Purpose:** Prepare package human docs, agent skills, Dojo artifacts, and feature inventories as evidence for a later deep feature matrix audit.
 **Scope:** Monorepos with many packages and global FlowState feature matrix records.
 **Trigger:** Before `flowstate-feature-matrix-audit`.
 **Input:** Monorepo root and global architecture/matrix context.
-**Output:** Package docs coverage, package-local skills, local feature inventories, and audit-ready evidence paths.
+**Output:** Package docs coverage, package-local skills, Dojo skill/course manifests, local feature inventories, and audit-ready evidence paths.
 
 ---
 
 ## Overview
 
-Run this before the deep feature matrix audit. It ensures the audit has package-level human docs, agent-operational skills, and feature evidence instead of forcing workers to rediscover basic package facts every time.
+Run this before the deep feature matrix audit. It ensures the audit has package-level human docs, agent-operational skills, Dojo publication artifacts, and feature evidence instead of forcing workers to rediscover basic package facts every time.
 
 ```text
-package audit -> human docs backfill -> agent skill backfill -> package feature inventory -> feature audit ready
+package audit -> human docs backfill -> agent skill backfill -> dojo artifacts -> package feature inventory -> feature audit ready
 ```
 
 ---
@@ -46,21 +46,31 @@ package audit -> human docs backfill -> agent skill backfill -> package feature 
    - Record unresolved candidates for later reconciliation.
    - Record unresolved `@epic-flow` references as legacy npm scope findings.
 
-5. Verify package audit artifacts.
+5. Prepare Dojo skill and course sync artifacts.
+   - Use `flowstate-package-dojo-audit` to classify current Dojo readiness.
+   - Use `flowstate-package-dojo-sync` to backfill or repair `.flowstate/dojo/skill.yaml`, `.flowstate/dojo/course.json`, and `.flowstate/dojo/sync-state.json` when in scope.
+   - Require Dojo skill/course versions to match `package.json`.
+   - Keep Dojo catalog course lessons mapped to the human docs pages and media under `.flowstate/docs/media`.
+   - Do not publish unless the current task explicitly includes cloud Dojo publish.
+
+6. Verify package audit artifacts.
    - Package path.
    - Package docs path.
    - Package skill path.
    - Package feature matrix path.
+   - Dojo skill manifest path.
+   - Dojo course manifest path.
+   - Dojo version alignment.
    - Strong global feature links.
    - Unmapped local features.
    - Legacy npm scope findings.
    - Manual review items.
 
-6. Produce feature audit input manifest.
+7. Produce feature audit input manifest.
    - Include only artifact paths, strong links, unresolved candidates, and manual review notes.
    - Do not require every unresolved feature to be mapped before moving to the next package.
 
-7. Hand off to feature audit.
+8. Hand off to feature audit.
    - `flowstate-feature-matrix-load`
    - `flowstate-feature-audit-subagent-dispatch`
    - `flowstate-feature-code-audit-worker`
@@ -74,6 +84,7 @@ package audit -> human docs backfill -> agent skill backfill -> package feature 
 - `.flowstate/package-docs/backfill/{auditRunId}/queue.json`
 - `.flowstate/package-docs/agent-skills/{auditRunId}/manifest.json`
 - `.flowstate/package-docs/feature-inventory/{auditRunId}/manifest.json`
+- `.flowstate/package-docs/dojo/{auditRunId}/manifest.json`
 - `.flowstate/package-docs/feature-audit-prep/{auditRunId}/handoff.md`
 
 ---
@@ -83,6 +94,7 @@ package audit -> human docs backfill -> agent skill backfill -> package feature 
 - Every package is classified.
 - Missing human docs are either backfilled or explicitly deferred.
 - Missing package-local agent skills are either backfilled or explicitly deferred.
+- Missing Dojo skill/course manifests are either backfilled or explicitly deferred.
 - Every package has a package-local feature matrix or documented reason it does not.
 - Unmapped local features are listed.
 - The global feature audit can consume package docs, package skills, and feature inventories as evidence.
@@ -97,7 +109,9 @@ package audit -> human docs backfill -> agent skill backfill -> package feature 
 - Do not block package coverage on unresolved global matrix links.
 - Keep backfill batches small enough for review.
 - Do not run docs sync from this prep unless the user explicitly says the docs-sync project is in scope.
+- Do not publish Dojo skills or courses from this prep unless the user explicitly says cloud Dojo publish is in scope.
 - Use `@epicdm` as the canonical npm organization for generated docs, package skills, examples, and feature inventories. Treat `@epic-flow` as legacy rename debt per `flowstate-epicdm-npm-scope`.
+- Use `flowstate-package-dojo-sync` so package version, human docs, agent skills, Dojo skill, catalog course, and feature inventory stay aligned.
 
 ---
 

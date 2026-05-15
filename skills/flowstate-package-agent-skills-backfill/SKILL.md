@@ -6,17 +6,17 @@ description: Use when a package lacks package-local agent skill equivalents for 
 # FlowState Package Agent Skills Backfill
 
 **Status:** Active
-**Purpose:** Create package-local agent skill equivalents for package human docs and feature inventories.
+**Purpose:** Create package-local agent skill equivalents for package human docs, Dojo skill publication, and feature inventories.
 **Scope:** `packages/<package>/.flowstate/skills`.
 **Trigger:** Package docs are being backfilled, package behavior changed, or package-local agent guidance is missing/stale.
 **Input:** Package path, package docs, package source, tests, scripts, and feature inventory.
-**Output:** One or more package-local `SKILL.md` files that agents can use for future package work.
+**Output:** One or more package-local `SKILL.md` files that agents can use for future package work and that can be converted into a Dojo skill manifest.
 
 ---
 
 ## Overview
 
-Human docs explain the package to people. Package-local skills explain the package to agents in an executable, context-efficient form.
+Human docs explain the package to people. Package-local skills explain the package to agents in an executable, context-efficient form. The package-local skill is also the source content for `.flowstate/dojo/skill.yaml` when the package is published to FlowState Cloud Dojo.
 
 ```text
 package evidence -> package skill -> agent workflows -> verification pointers
@@ -53,6 +53,7 @@ Do not install these into `~/.codex/skills` or the shared `epic-flowstate-skills
    - Human docs under `.flowstate/docs`.
    - Source entry points, routes, commands, providers, adapters, and tests.
    - `.flowstate/feature-matrix/package-features.json` when present.
+   - `.flowstate/dojo/skill.yaml` and `.flowstate/dojo/sync-state.json` when present.
    - Canonical documentation rules embedded in `flowstate-package-docs-standards`.
    - Canonical npm scope rules embedded in `flowstate-epicdm-npm-scope`.
 
@@ -75,6 +76,7 @@ Do not install these into `~/.codex/skills` or the shared `epic-flowstate-skills
    - Verification commands.
    - Config/env/secrets.
    - Feature inventory pointers.
+   - Dojo skill/course pointers and version expectations.
    - Known pitfalls.
    - Out-of-scope boundaries.
 
@@ -83,7 +85,12 @@ Do not install these into `~/.codex/skills` or the shared `epic-flowstate-skills
    - Link feature JSON and handoff note.
    - Point agents to unresolved feature links instead of hiding them.
 
-6. Verify.
+6. Cross-link Dojo artifacts.
+   - Link `.flowstate/dojo/skill.yaml`, `.flowstate/dojo/course.json`, and `.flowstate/dojo/sync-state.json`.
+   - State that Dojo skill/course versions must match `package.json`.
+   - State whether cloud publish is in or out of scope for the package skill.
+
+7. Verify.
    - Confirm the skill file exists.
    - Confirm frontmatter has `name` and `description`.
    - Confirm no global-only or stale package paths are hardcoded.
@@ -152,11 +159,14 @@ description: Use when working on <package-name> package behavior, docs, tests, r
 - Use package-relative paths.
 - Prefer concise executable guidance over long prose.
 - Do not copy all human docs into the skill.
+- Do not copy all LMS lesson content into the skill.
 - Do not claim package behavior without source, script, or test evidence.
 - Do not force unresolved global feature links.
 - Do not run docs sync from this skill.
+- Do not publish Dojo skills or courses from this skill unless explicitly requested.
 - Keep package skill changes reviewable with the package docs and feature inventory changes.
 - Package skills must reference human docs that follow `flowstate-package-docs-standards`; do not create agent-only guidance as a substitute for required human docs.
+- Package skills must reference Dojo artifacts when present so `flowstate-package-dojo-sync` can publish a version-locked Dojo skill.
 - Package skills must follow `flowstate-epicdm-npm-scope`: use `@epicdm` in package identity and examples, and record unresolved `@epic-flow` references as legacy findings.
 
 ---
