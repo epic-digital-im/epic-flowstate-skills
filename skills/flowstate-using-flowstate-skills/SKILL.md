@@ -186,6 +186,20 @@ Use these when creating products, linking to business plans, and associating tea
 
 ---
 
+## Forgejo CLI Skills
+
+Use these when replacing GitHub `gh` workflows with Forgejo `fj` workflows for FlowState repositories.
+
+| Skill Name                           | When to Use                                                                       |
+| ------------------------------------ | --------------------------------------------------------------------------------- |
+| `flowstate-forgejo-cli`              | Foundation for `fj` host/auth/targeting, token safety, and gh-to-fj command shape |
+| `flowstate-forgejo-pr-workflow`      | Pull request list/view/create/checkout/comment/merge workflows with `fj`          |
+| `flowstate-forgejo-issue-workflow`   | Issue search/view/create/comment/assign/close workflows with `fj`                 |
+| `flowstate-forgejo-actions`          | Forgejo Actions task status, workflow dispatch, variables, and secrets            |
+| `flowstate-forgejo-release-workflow` | Forgejo tags, releases, assets, drafts, prereleases, and release safety gates      |
+
+---
+
 ## Template Skills
 
 | Skill Name                   | When to Use                                                     |
@@ -279,6 +293,12 @@ flowstate-dojo-cli                             <- canonical Dojo CLI command ref
 ├── flowstate-dojo-course-lifecycle            <- course/module/item/enrollment workflows
 ├── flowstate-dojo-team-community              <- team/member/content/event workflows
 └── flowstate-dojo-production-smoke            <- production deploy verification
+
+flowstate-forgejo-cli                          <- foundation for Forgejo fj workflows
+├── flowstate-forgejo-pr-workflow              <- PR lifecycle and gh-pr equivalents
+├── flowstate-forgejo-issue-workflow           <- issue lifecycle and gh-issue equivalents
+├── flowstate-forgejo-actions                  <- Actions tasks, dispatch, variables, secrets
+└── flowstate-forgejo-release-workflow         <- tags, releases, and assets
 
 flowstate-task-execution                       <- references these sub-skills:
 ├── flowstate-agent-identity                   <- Step 0: load agent before claiming task
