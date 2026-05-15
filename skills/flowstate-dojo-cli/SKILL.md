@@ -146,6 +146,13 @@ Successful empty deletes should be treated as success by exit code and HTTP stat
 
 The skill/course catalog and publisher commands are available under both `flowstate dojo` and `flowstate cloud dojo`. Prefer `flowstate cloud dojo` in authenticated docker/container agents.
 
+Dojo has two intentionally different course command families:
+
+- `courses` (plural) is LMS CRUD for live course records, modules, items, enrollment, and publish state.
+- `course` (singular) is catalog packaging for publishing a versioned course artifact from `course.json`.
+
+Use `courses ...` when operating on live LMS objects. Use `course publish <json-file>` when syncing package documentation into a versioned catalog course artifact.
+
 | Command | Purpose |
 | ------- | ------- |
 | `skill list|get|validate|publish|install|update|list-installed` | Skill catalog and package skill publication commands |

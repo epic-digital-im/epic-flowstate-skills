@@ -1,12 +1,12 @@
 ---
 name: flowstate-package-dojo-sync
-description: Use when package documentation, package-local agent skills, package versions, or LMS lessons need to be published or reconciled with FlowState Cloud Dojo - provides version-locked Dojo skill and course sync rules.
+description: Use when package documentation, package-local agent skills, package versions, or Dojo catalog course lessons need to be published or reconciled with FlowState Cloud Dojo - provides version-locked Dojo skill and course sync rules.
 ---
 
 # FlowState Package Dojo Sync
 
 **Status:** Active
-**Purpose:** Keep package-local human docs, agent skills, Dojo skill manifests, Dojo LMS course manifests, and package versions in lockstep.
+**Purpose:** Keep package-local human docs, agent skills, Dojo skill manifests, Dojo catalog course manifests, and package versions in lockstep.
 **Scope:** `packages/<package>/.flowstate/dojo` plus package docs, package-local skills, and feature inventory.
 **Trigger:** Package docs audit/backfill, PR docs maintenance, package version bump, package-local skill update, or LMS content update.
 **Input:** Package path, `package.json`, package docs, package-local skills, feature inventory, and Dojo publisher identity.
@@ -21,9 +21,11 @@ Every documented package owns four synchronized knowledge surfaces:
 1. Human documentation under `.flowstate/docs`.
 2. Agent skill equivalents under `.flowstate/skills`.
 3. Dojo skill publication manifest under `.flowstate/dojo/skill.yaml`.
-4. Dojo LMS course publication manifest under `.flowstate/dojo/course.json`.
+4. Dojo catalog course publication manifest under `.flowstate/dojo/course.json`.
 
-The package `package.json` version is the version authority. Dojo skill versions and Dojo course versions must match it exactly unless the package is explicitly marked non-publishable with a reason.
+The package `package.json` version is the version authority. Dojo skill versions and Dojo catalog course versions must match it exactly unless the package is explicitly marked non-publishable with a reason.
+
+Non-publishable packages are marked in `.flowstate/dojo/sync-state.json` with `"publishable": false` and a non-empty `"nonPublishableReason"`. Audit and sync steps should still verify human docs, package-local skills, and feature inventory, but they should not require `skill.yaml` or `course.json` publish readiness and must not run publish commands for that package.
 
 ```text
 package version -> human docs -> package skill -> dojo skill/course manifests -> cloud publish -> sync state
@@ -111,9 +113,9 @@ flowstate cloud dojo skill publish packages/<package>/.flowstate/dojo/skill.yaml
 
 ---
 
-## Dojo Course Manifest
+## Dojo Catalog Course Manifest
 
-`course.json` must use the generated `CoursePublishRequest` shape from `packages/flowstate-cli/src/generated/dojo/types.ts`:
+`course.json` targets the singular Dojo catalog `course publish` command, not the plural LMS CRUD `courses` command family. It must use the generated `CoursePublishRequest` shape from `packages/flowstate-cli/src/generated/dojo/types.ts`:
 
 ```json
 {
@@ -146,7 +148,7 @@ Lessons should map to the package docs set:
 
 Screenshots, videos, and other assets should be package-local under `.flowstate/docs/media` and referenced from lesson content only when they exist and are current. Do not fabricate media references.
 
-Publish:
+Publish the packaged catalog course artifact:
 
 ```bash
 flowstate cloud dojo course publish packages/<package>/.flowstate/dojo/course.json
@@ -162,6 +164,8 @@ flowstate cloud dojo course publish packages/<package>/.flowstate/dojo/course.js
 {
   "packageName": "@epicdm/example",
   "packageVersion": "0.0.0",
+  "publishable": true,
+  "nonPublishableReason": null,
   "publisher": "epic-digital",
   "dojoSkillId": "flowstate-example",
   "dojoSkillVersionId": null,

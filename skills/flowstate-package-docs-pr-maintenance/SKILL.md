@@ -65,7 +65,7 @@ Documentation and package-skill maintenance are part of the PR definition of don
    - Use `flowstate-package-dojo-audit` for affected packages.
    - Use `flowstate-package-dojo-sync` to update `.flowstate/dojo/skill.yaml`, `.flowstate/dojo/course.json`, and `.flowstate/dojo/sync-state.json`.
    - Match Dojo skill/course versions to `package.json`.
-   - Update LMS lessons when docs, screenshots, videos, workflows, API behavior, or troubleshooting guidance changes.
+   - Update Dojo catalog course lessons when docs, screenshots, videos, workflows, API behavior, or troubleshooting guidance changes.
    - Validate with `flowstate dojo skill validate <skill.yaml>` when the CLI is available.
    - Do not publish unless the PR task explicitly includes cloud Dojo publish.
 
@@ -95,7 +95,7 @@ Documentation and package-skill maintenance are part of the PR definition of don
 - [ ] API/workflow/troubleshooting docs updated if needed.
 - [ ] Agent workflows/commands/pitfalls updated if needed.
 - [ ] Dojo skill/course manifests reviewed and version-matched to `package.json`.
-- [ ] Dojo LMS lessons/media updated if human docs changed.
+- [ ] Dojo catalog course lessons/media updated if human docs changed.
 - [ ] Package feature matrix updated if feature behavior changed.
 - [ ] Legacy `@epic-flow` references checked and updated or recorded.
 - [ ] Screenshots updated for UI changes.

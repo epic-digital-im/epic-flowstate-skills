@@ -10,13 +10,13 @@ description: Use when a monorepo package set may have missing, stale, or non-sta
 **Scope:** Monorepos with packages under `packages/*`.
 **Trigger:** Before docs/skills backfill, before feature matrix audit, or when package knowledge coverage is unknown.
 **Input:** Monorepo root path.
-**Output:** Package audit report and backfill queue covering docs, skills, Dojo manifests, LMS course content, and feature inventory links.
+**Output:** Package audit report and backfill queue covering docs, skills, Dojo manifests, catalog course content, and feature inventory links.
 
 ---
 
 ## Overview
 
-Package documentation audit is the first step before feature matrix audit. The global feature audit needs package-level evidence, so every package must have predictable human docs, package-local agent skills, Dojo publish manifests, LMS course content, and a feature inventory.
+Package documentation audit is the first step before feature matrix audit. The global feature audit needs package-level evidence, so every package must have predictable human docs, package-local agent skills, Dojo publish manifests, catalog course content, and a feature inventory.
 
 ```text
 scan packages -> validate docs/skills/dojo/config/features -> classify gaps -> write report -> queue backfill

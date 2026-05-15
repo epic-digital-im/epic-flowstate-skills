@@ -1,12 +1,12 @@
 ---
 name: flowstate-package-dojo-audit
-description: Use when auditing whether package docs, package-local skills, Dojo skill manifests, Dojo LMS course manifests, and package versions are aligned before publish or feature matrix reconciliation.
+description: Use when auditing whether package docs, package-local skills, Dojo skill manifests, Dojo catalog course manifests, and package versions are aligned before publish or feature matrix reconciliation.
 ---
 
 # FlowState Package Dojo Audit
 
 **Status:** Active
-**Purpose:** Detect version, docs, agent skill, Dojo skill, LMS course, and feature-link drift for a package.
+**Purpose:** Detect version, docs, agent skill, Dojo skill, catalog course, and feature-link drift for a package.
 **Scope:** One package or a package-docs audit queue.
 **Trigger:** Before package docs backfill, PR merge, Dojo publish, or deep feature matrix audit.
 **Input:** Package path, docs audit output, package feature inventory, and optional cloud catalog lookup output.
@@ -46,6 +46,7 @@ package -> docs/skills/features -> dojo manifests -> version lock -> publish rea
    - `.flowstate/dojo/course.json` exists and parses.
    - `.flowstate/dojo/sync-state.json` exists and parses.
    - Manifest publisher is present and stable.
+   - If `sync-state.json` has `"publishable": false`, require a non-empty `nonPublishableReason` and skip publish-readiness requirements for `skill.yaml` and `course.json`.
 
 5. Version lock.
    - `skill.yaml` `metadata.version` equals `package.json` `version`.

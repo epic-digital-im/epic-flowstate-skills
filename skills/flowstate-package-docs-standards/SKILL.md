@@ -20,7 +20,7 @@ Each package owns four local knowledge surfaces:
 1. Human documentation under `.flowstate/docs`.
 2. Agent skill equivalents under `.flowstate/skills`.
 3. Feature inventory and matrix evidence under `.flowstate/feature-matrix`.
-4. Dojo skill and LMS course manifests under `.flowstate/dojo`.
+4. Dojo skill and catalog course manifests under `.flowstate/dojo`.
 
 Human docs explain the package to people. Package-local skills explain the package to agents in a concise, executable form. Feature inventories preserve current-state evidence for later global feature matrix reconciliation. Dojo manifests publish the same package knowledge into FlowState Cloud Dojo as a versioned skill and course.
 
@@ -225,7 +225,7 @@ Do not install package-local skills into the global user skill directory during 
 Every publishable package must keep Dojo artifacts beside docs:
 
 - `.flowstate/dojo/skill.yaml` publishes the package-local agent skill to the Dojo skill catalog.
-- `.flowstate/dojo/course.json` publishes the package human docs as a Dojo LMS course.
+- `.flowstate/dojo/course.json` publishes the package human docs through the Dojo catalog `course` command family, which produces the packaged course artifact consumed by Dojo learning surfaces.
 - `.flowstate/dojo/sync-state.json` records cloud IDs, version IDs, verification status, and unresolved sync items.
 
 The Dojo skill and course versions must match `package.json` `version`. Human docs and agent skills must describe the same package behavior before either artifact is published.
@@ -290,7 +290,7 @@ If package evidence includes legacy `@epic-flow` npm references, record them in 
 - Link related package docs with relative links.
 - Do not claim feature availability without code or test evidence.
 - Do not claim agent workflow support without source, script, command, or test evidence.
-- Keep screenshots in `.flowstate/docs/screenshots/...` when needed.
+- Keep screenshots in `.flowstate/docs/media/screenshots/...` when needed.
 - Preserve generated sections with clear markers if automation updates them.
 - Follow the canonical package documentation process embedded in this skill: config schema, app/library template choice, frontmatter, nested `index.md` pages, language-tagged code fences, and TSDoc for library APIs.
 - Respect the docs-sync ownership boundary: package backfill produces route-compatible docs; the separate docs-sync project runs `yarn workspace @epicdm/flowstate-docs docs:sync`.

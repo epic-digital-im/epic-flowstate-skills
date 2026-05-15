@@ -50,7 +50,7 @@ package audit -> human docs backfill -> agent skill backfill -> dojo artifacts -
    - Use `flowstate-package-dojo-audit` to classify current Dojo readiness.
    - Use `flowstate-package-dojo-sync` to backfill or repair `.flowstate/dojo/skill.yaml`, `.flowstate/dojo/course.json`, and `.flowstate/dojo/sync-state.json` when in scope.
    - Require Dojo skill/course versions to match `package.json`.
-   - Keep LMS lessons mapped to the human docs pages and media under `.flowstate/docs/media`.
+   - Keep Dojo catalog course lessons mapped to the human docs pages and media under `.flowstate/docs/media`.
    - Do not publish unless the current task explicitly includes cloud Dojo publish.
 
 6. Verify package audit artifacts.
@@ -111,7 +111,7 @@ package audit -> human docs backfill -> agent skill backfill -> dojo artifacts -
 - Do not run docs sync from this prep unless the user explicitly says the docs-sync project is in scope.
 - Do not publish Dojo skills or courses from this prep unless the user explicitly says cloud Dojo publish is in scope.
 - Use `@epicdm` as the canonical npm organization for generated docs, package skills, examples, and feature inventories. Treat `@epic-flow` as legacy rename debt per `flowstate-epicdm-npm-scope`.
-- Use `flowstate-package-dojo-sync` so package version, human docs, agent skills, Dojo skill, LMS course, and feature inventory stay aligned.
+- Use `flowstate-package-dojo-sync` so package version, human docs, agent skills, Dojo skill, catalog course, and feature inventory stay aligned.
 
 ---
 
